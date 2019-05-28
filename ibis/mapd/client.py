@@ -333,7 +333,9 @@ class MapDClient(SQLClient):
         port=6274,
         database=None,
         protocol='binary',
+        sessionid=None,
         execution_type=EXECUTION_TYPE_CURSOR,
+        osconn=None,
     ):
         """
 
@@ -349,6 +351,21 @@ class MapDClient(SQLClient):
         execution_type : {
           EXECUTION_TYPE_ICP, EXECUTION_TYPE_ICP_GPU, EXECUTION_TYPE_CURSOR
         }
+        osconn : pymapd.connection.Connection
+
+        Examples
+        --------
+        You can either pass the same parameters that pymapd accepts,
+        or an existing pymapd conneciton object. In both cases the
+        execution type can also be passed.
+
+        >>> connect('mapd://mapd:HyperInteractive@localhost:6274/mapd?'
+        ...         'protocol=binary', execution_type=1)
+        >>> connect(user='mapd', password='HyperInteractive', host='localhost',
+        ...         port=6274, dbname='mapd')
+        >>> connect(sessionid='XihlkjhdasfsadSDoasdllMweieisdpo', host='localhost',
+        ...         port=6273, protocol='http', execution_type=3)
+        >>> connect(osconn=omnisciconn, execution_type=2)
 
         """
         self.uri = uri
@@ -358,6 +375,8 @@ class MapDClient(SQLClient):
         self.port = port
         self.db_name = database
         self.protocol = protocol
+        self.sessionid = sessionid
+        self.osconn = osconn
 
         if execution_type not in (
             EXECUTION_TYPE_ICP,
@@ -368,15 +387,32 @@ class MapDClient(SQLClient):
 
         self.execution_type = execution_type
 
-        self.con = pymapd.connect(
-            uri=uri,
-            user=user,
-            password=password,
-            host=host,
-            port=port,
-            dbname=database,
-            protocol=protocol,
-        )
+        if self.osconn is not None:
+            if any([self.uri,
+                    self.user,
+                    self.password,
+                    self.host,
+                    self.port,
+                    self.db_name,
+                    self.protocol,
+                    self.sessionid,
+                ]):
+                raise TypeError("Cannot pass an existing connection "
+                                "object with any other parameter except"
+                                " execution_type.")
+            self.con = self.osconn
+        else:
+            self.con = pymapd.connect(
+                uri=uri,
+                user=user,
+                password=password,
+                host=host,
+                port=port,
+                dbname=database,
+                protocol=protocol,
+                sessionid=sessionid,
+            )
+
 
     def __del__(self):
         self.close()
