@@ -335,7 +335,7 @@ class MapDClient(SQLClient):
         protocol=None,
         sessionid=None,
         execution_type=EXECUTION_TYPE_CURSOR,
-        osconn=None,
+        ospyconn=None,
     ):
         """
 
@@ -351,7 +351,7 @@ class MapDClient(SQLClient):
         execution_type : {
           EXECUTION_TYPE_ICP, EXECUTION_TYPE_ICP_GPU, EXECUTION_TYPE_CURSOR
         }
-        osconn : pymapd.connection.Connection
+        ospyconn : pymapd.connection.Connection
 
         """
         self.uri = uri
@@ -362,7 +362,7 @@ class MapDClient(SQLClient):
         self.db_name = database
         self.protocol = protocol
         self.sessionid = sessionid
-        self.osconn = osconn
+        self.ospyconn = ospyconn
 
         if execution_type not in (
             EXECUTION_TYPE_ICP,
@@ -372,7 +372,7 @@ class MapDClient(SQLClient):
             raise Exception('Execution type defined not available.')
 
         self.execution_type = execution_type
-        if self.osconn:
+        if self.ospyconn:
             if any([self.uri,
                     self.user,
                     self.password,
@@ -385,10 +385,10 @@ class MapDClient(SQLClient):
                 raise TypeError("Cannot pass an existing connection "
                                 "object with any other parameter except"
                                 " execution_type.")
-            if not isinstance(self.osconn, pymapd.connection.Connection):
-                raise TypeError("The osconn parameter must be passed a pymapd"
+            if not isinstance(self.ospyconn, pymapd.connection.Connection):
+                raise TypeError("The ospyconn parameter must be passed a pymapd"
                                 " connection object.")
-            self.con = self.osconn
+            self.con = self.ospyconn
         else:
             port = port or 6274
             protocol = protocol or 'binary'

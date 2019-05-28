@@ -40,7 +40,7 @@ def connect(
     protocol=None,
     sessionid=None,
     execution_type=EXECUTION_TYPE_CURSOR,
-    osconn=None,
+    ospyconn=None,
 ):
     """Create a MapDClient for use with Ibis
 
@@ -54,7 +54,7 @@ def connect(
     :param database: str
     :param protocol: str
     :param execution_type: int
-    :param osconn: pymapd.connection.Connection
+    :param ospyconn: pymapd.connection.Connection
 
     Examples
     --------
@@ -68,7 +68,7 @@ def connect(
     ...         port=6274, dbname='mapd')
     >>> connect(sessionid='XihlkjhdasfsadSDoasdllMweieisdpo', host='localhost',
     ...         port=6273, protocol='http', execution_type=3)
-    >>> connect(osconn=omnisciconn, execution_type=2)
+    >>> connect(ospyconn=omnisciconn, execution_type=2)
 
     Returns
     -------
@@ -85,7 +85,7 @@ def connect(
         protocol=protocol,
         sessionid=sessionid,
         execution_type=execution_type,
-        osconn=osconn,
+        ospyconn=ospyconn,
     )
 
     if options.default_backend is None:
