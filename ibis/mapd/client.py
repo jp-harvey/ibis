@@ -330,9 +330,9 @@ class MapDClient(SQLClient):
         user=None,
         password=None,
         host=None,
-        port=6274,
+        port=None,
         database=None,
-        protocol='binary',
+        protocol=None,
         sessionid=None,
         execution_type=EXECUTION_TYPE_CURSOR,
         osconn=None,
@@ -353,20 +353,6 @@ class MapDClient(SQLClient):
         }
         osconn : pymapd.connection.Connection
 
-        Examples
-        --------
-        You can either pass the same parameters that pymapd accepts,
-        or an existing pymapd conneciton object. In both cases the
-        execution type can also be passed.
-
-        >>> connect('mapd://mapd:HyperInteractive@localhost:6274/mapd?'
-        ...         'protocol=binary', execution_type=1)
-        >>> connect(user='mapd', password='HyperInteractive', host='localhost',
-        ...         port=6274, dbname='mapd')
-        >>> connect(sessionid='XihlkjhdasfsadSDoasdllMweieisdpo', host='localhost',
-        ...         port=6273, protocol='http', execution_type=3)
-        >>> connect(osconn=omnisciconn, execution_type=2)
-
         """
         self.uri = uri
         self.user = user
@@ -386,8 +372,7 @@ class MapDClient(SQLClient):
             raise Exception('Execution type defined not available.')
 
         self.execution_type = execution_type
-
-        if self.osconn is not None:
+        if self.osconn:
             if any([self.uri,
                     self.user,
                     self.password,
@@ -400,8 +385,13 @@ class MapDClient(SQLClient):
                 raise TypeError("Cannot pass an existing connection "
                                 "object with any other parameter except"
                                 " execution_type.")
+            if not isinstance(self.osconn, pymapd.connection.Connection):
+                raise TypeError("The osconn parameter must be passed a pymapd"
+                                " connection object.")
             self.con = self.osconn
         else:
+            port = port or 6274
+            protocol = protocol or 'binary'
             self.con = pymapd.connect(
                 uri=uri,
                 user=user,

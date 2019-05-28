@@ -35,10 +35,12 @@ def connect(
     user=None,
     password=None,
     host=None,
-    port=6274,
+    port=None,
     database=None,
-    protocol='binary',
+    protocol=None,
+    sessionid=None,
     execution_type=EXECUTION_TYPE_CURSOR,
+    osconn=None,
 ):
     """Create a MapDClient for use with Ibis
 
@@ -52,6 +54,22 @@ def connect(
     :param database: str
     :param protocol: str
     :param execution_type: int
+    :param osconn: pymapd.connection.Connection
+
+    Examples
+    --------
+    You can either pass the same parameters that pymapd accepts,
+    or an existing pymapd conneciton object. In both cases the
+    execution type can also be passed.
+
+    >>> connect('mapd://mapd:HyperInteractive@localhost:6274/mapd?'
+    ...         'protocol=binary', execution_type=1)
+    >>> connect(user='mapd', password='HyperInteractive', host='localhost',
+    ...         port=6274, dbname='mapd')
+    >>> connect(sessionid='XihlkjhdasfsadSDoasdllMweieisdpo', host='localhost',
+    ...         port=6273, protocol='http', execution_type=3)
+    >>> connect(osconn=omnisciconn, execution_type=2)
+
     Returns
     -------
     MapDClient
@@ -65,7 +83,9 @@ def connect(
         port=port,
         database=database,
         protocol=protocol,
+        sessionid=sessionid,
         execution_type=execution_type,
+        osconn=osconn,
     )
 
     if options.default_backend is None:
